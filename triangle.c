@@ -6,12 +6,18 @@ int main()
 {
     int height;
     scanf("%d\n", &height);
-    char symbol;
-    scanf("%c", &symbol);
+    char symbol1, symbol2;
+    scanf("%c %c", &symbol1, &symbol2);
 
     for (int i = 0; i < height; i++)
     {
-        drawLine(height - i - 1, i * 2 + 1, symbol);
+        char curSymbol;
+        if ((i + 1) % 2 == 1) {
+            curSymbol = symbol1;
+        } else {
+            curSymbol = symbol2;
+        }
+        drawLine(height - i - 1, i * 2 + 1, curSymbol);
     }
 
     return 0;
