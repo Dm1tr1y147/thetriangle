@@ -1,15 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 #include <unistd.h>
+
+typedef struct
+{
+    char type[3];
+    unsigned height;
+    char symbol1, symbol2;
+    bool romb;
+} triangle;
 
 void clrscr();
 bool strcomp(char *a, char *b);
 void swap(char *a, char *b);
-void drawTriangle(char type[3], int height, char symbol1, char symbol2);
-void drawRomb(char type[3], int height, char symbol1, char symbol2);
+void drawTriangle(triangle tr);
+void drawRomb(triangle tr);
 void drawLine(int freeSpace, int length, char symbol);
-void getTriangleOptions(char *type);
+triangle getTriangleOptions(triangle tr);
 
 int main()
 {
@@ -23,17 +32,26 @@ int main()
     printf("***** Hope you'll enjoy using it!\n");
     printf("\n\n");
 
-    sleep(2);
+    // sleep(2); disabled while development
 
     clrscr();
 
     /*
         Preview
     */
-    drawTriangle("so", 5, '*', '\0');
+    triangle solid;
+    strcpy(solid.type, "so");
+    solid.height = 5;
+    solid.symbol1 = '*';
+    drawTriangle(solid);
     printf("(so)lid\n");
 
-    drawTriangle("st", 5, '*', '+');
+    triangle stripped;
+    strcpy(stripped.type, "st");
+    stripped.height = 5;
+    stripped.symbol1 = '*';
+    stripped.symbol2 = '+';
+    drawTriangle(stripped);
     printf("(st)ripped\n");
 
     /*
@@ -41,48 +59,23 @@ int main()
     */
     printf("Select what mode do you want to work with: ");
 
+    triangle tr;
+
     // Type
-    char type[3];
-    fgets(type, 3, stdin);
+    fgets(tr.type, 3, stdin);
 
-    printf("%s. Great choise!\n", (strcomp(type, "so") ? "Solid" : "Stripped"));
-
-    // Height
-    int height;
-    printf("Height of triangle: ");
-    scanf("%d", &height);
-    getchar();
-
-    // Primary symbol
-    char symbol1;
-    printf("Primary symbol: ");
-    symbol1 = getchar();
-    getchar();
-
-    // Secondary symbol
-    char symbol2;
-    if (strcomp(type, "st"))
-    {
-        printf("Secondary symbol: ");
-        symbol2 = getchar();
-        getchar();
-    }
-
-    // Romb
-    bool romb;
-    printf("Make a romb? (y/n): ");
-    romb = getchar() == 'y';
+    printf("%s. Great choise!\n", (strcomp(tr.type, "so") ? "Solid" : "Stripped"));
 
     /*
         Drawing
     */
-    if (romb)
+    if (tr.romb)
     {
-        drawRomb(type, height, symbol1, symbol2);
+        drawRomb(tr);
     }
     else
     {
-        drawTriangle(type, height, symbol1, symbol2);
+        drawTriangle(tr);
     }
 
     return 0;
@@ -114,13 +107,13 @@ void swap(char *a, char *b)
     *a = *a ^ *b;
 }
 
-void drawTriangle(char type[3], int height, char symbol1, char symbol2)
+void drawTriangle(triangle tr)
 {
-    if (strcomp(type, "so"))
+    if (strcomp(tr.type, "so"))
     {
-        symbol2 = symbol1;
+        tr.symbol2 = tr.symbol1;
     }
-    else if (strcomp(type, "st"))
+    else if (strcomp(tr.type, "st"))
     {
     }
     else
@@ -129,28 +122,28 @@ void drawTriangle(char type[3], int height, char symbol1, char symbol2)
         return;
     }
 
-    for (int i = 0; i < height; i++)
+    for (int i = 0; i < tr.height; i++)
     {
         char curSymbol;
         if ((i + 1) % 2 == 1)
         {
-            curSymbol = symbol1;
+            curSymbol = tr.symbol1;
         }
         else
         {
-            curSymbol = symbol2;
+            curSymbol = tr.symbol2;
         }
-        drawLine(height - i - 1, i * 2 + 1, curSymbol);
+        drawLine(tr.height - i - 1, i * 2 + 1, curSymbol);
     }
 }
 
-void drawRomb(char type[3], int height, char symbol1, char symbol2)
+void drawRomb(triangle tr)
 {
-    if (strcomp(type, "so"))
+    if (strcomp(tr.type, "so"))
     {
-        symbol2 = symbol1;
+        tr.symbol2 = tr.symbol1;
     }
-    else if (strcomp(type, "st"))
+    else if (strcomp(tr.type, "st"))
     {
     }
     else
@@ -159,35 +152,35 @@ void drawRomb(char type[3], int height, char symbol1, char symbol2)
         return;
     }
 
-    for (int i = 0; i < height / 2; i++)
+    for (int i = 0; i < tr.height / 2; i++)
     {
         char curSymbol;
         if ((i + 1) % 2 == 1)
         {
-            curSymbol = symbol1;
+            curSymbol = tr.symbol1;
         }
         else
         {
-            curSymbol = symbol2;
+            curSymbol = tr.symbol2;
         }
-        drawLine(height / 2 - i, i * 2 + 1, curSymbol);
+        drawLine(tr.height / 2 - i, i * 2 + 1, curSymbol);
     }
 
-    if (height % 2 == 0)
-        swap(&symbol1, &symbol2);
+    if (tr.height % 2 == 0)
+        swap(&tr.symbol1, &tr.symbol2);
 
-    for (int i = height - (height / 2 + 1); i >= 0; i--)
+    for (int i = tr.height - (tr.height / 2 + 1); i >= 0; i--)
     {
         char curSymbol;
         if ((i + 1) % 2 == 1)
         {
-            curSymbol = symbol1;
+            curSymbol = tr.symbol1;
         }
         else
         {
-            curSymbol = symbol2;
+            curSymbol = tr.symbol2;
         }
-        drawLine(height / 2 - i, i * 2 + 1, curSymbol);
+        drawLine(tr.height / 2 - i, i * 2 + 1, curSymbol);
     }
 }
 
@@ -204,7 +197,29 @@ void drawLine(int freeSpace, int length, char symbol)
     putchar('\n');
 }
 
-void getTriangleOptions(char *type)
+triangle getTriangleOptions(triangle tr)
 {
-    printf("");
+    // Height
+    printf("Height of triangle: ");
+    scanf("%d", &tr.height);
+    getchar();
+
+    // Primary symbol
+    printf("Primary symbol: ");
+    tr.symbol1 = getchar();
+    getchar();
+
+    // Secondary symbol
+    if (strcomp(tr.type, "st"))
+    {
+        printf("Secondary symbol: ");
+        tr.symbol2 = getchar();
+        getchar();
+    }
+
+    // Romb
+    printf("Make a romb? (y/n): ");
+    tr.romb = getchar() == 'y';
+
+    return tr;
 }
