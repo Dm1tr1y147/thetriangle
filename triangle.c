@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdbool.h>
 #include <unistd.h>
 
 typedef struct
 {
     char type[3];
-    unsigned height;
+    int height;
     char symbol1, symbol2;
     bool romb;
 } triangle;
@@ -16,7 +15,8 @@ void clrscr();
 bool strcomp(char *a, char *b);
 void swap(char *a, char *b);
 void drawTriangle(triangle tr);
-void drawRomb(triangle tr);
+void drawFlippedTriangle(triangle tr);
+char curSymbol(char symbol1, char symbol2, int i);
 void drawLine(int freeSpace, int length, char symbol);
 triangle getTriangleOptions(triangle tr);
 
@@ -39,44 +39,37 @@ int main()
     /*
         Preview
     */
-    triangle solid;
-    strcpy(solid.type, "so");
-    solid.height = 5;
-    solid.symbol1 = '*';
+    triangle solid = {
+        .type = "so",
+        .height = 5,
+        .symbol1 = '*',
+        .romb = false};
     drawTriangle(solid);
     printf("(so)lid\n");
 
-    triangle stripped;
-    strcpy(stripped.type, "st");
-    stripped.height = 5;
-    stripped.symbol1 = '*';
-    stripped.symbol2 = '+';
+    triangle stripped = {
+        .type = "st",
+        .height = 5,
+        .symbol1 = '*',
+        .symbol2 = '+',
+        .romb = false};
     drawTriangle(stripped);
     printf("(st)ripped\n");
 
     /*
         Configuration
     */
-    printf("Select what mode do you want to work with: ");
-
     triangle tr;
 
-    // Type
-    fgets(tr.type, 3, stdin);
-
-    printf("%s. Great choise!\n", (strcomp(tr.type, "so") ? "Solid" : "Stripped"));
+    tr = getTriangleOptions(tr);
 
     /*
         Drawing
     */
+    drawTriangle(tr);
+
     if (tr.romb)
-    {
-        drawRomb(tr);
-    }
-    else
-    {
-        drawTriangle(tr);
-    }
+        drawFlippedTriangle(tr);
 
     return 0;
 }
@@ -110,95 +103,53 @@ void swap(char *a, char *b)
 void drawTriangle(triangle tr)
 {
     if (strcomp(tr.type, "so"))
-    {
         tr.symbol2 = tr.symbol1;
-    }
-    else if (strcomp(tr.type, "st"))
+
+    if (tr.romb)
     {
-    }
-    else
-    {
-        printf("Wrong input, try angain\n");
-        return;
+        tr.height /= 2;
+        tr.height++;
     }
 
     for (int i = 0; i < tr.height; i++)
-    {
-        char curSymbol;
-        if ((i + 1) % 2 == 1)
-        {
-            curSymbol = tr.symbol1;
-        }
-        else
-        {
-            curSymbol = tr.symbol2;
-        }
-        drawLine(tr.height - i - 1, i * 2 + 1, curSymbol);
-    }
+        drawLine(tr.height - i - 1, i * 2 + 1, curSymbol(tr.symbol1, tr.symbol2, i));
 }
 
-void drawRomb(triangle tr)
+void drawFlippedTriangle(triangle tr)
 {
     if (strcomp(tr.type, "so"))
-    {
         tr.symbol2 = tr.symbol1;
-    }
-    else if (strcomp(tr.type, "st"))
-    {
-    }
-    else
-    {
-        printf("Wrong input, try angain\n");
-        return;
-    }
-
-    for (int i = 0; i < tr.height / 2; i++)
-    {
-        char curSymbol;
-        if ((i + 1) % 2 == 1)
-        {
-            curSymbol = tr.symbol1;
-        }
-        else
-        {
-            curSymbol = tr.symbol2;
-        }
-        drawLine(tr.height / 2 - i, i * 2 + 1, curSymbol);
-    }
-
-    if (tr.height % 2 == 0)
-        swap(&tr.symbol1, &tr.symbol2);
 
     for (int i = tr.height - (tr.height / 2 + 1); i >= 0; i--)
-    {
-        char curSymbol;
-        if ((i + 1) % 2 == 1)
-        {
-            curSymbol = tr.symbol1;
-        }
-        else
-        {
-            curSymbol = tr.symbol2;
-        }
-        drawLine(tr.height / 2 - i, i * 2 + 1, curSymbol);
-    }
+        drawLine(tr.height / 2 - i, i * 2 + 1, curSymbol(tr.symbol1, tr.symbol2, i));
+}
+
+char curSymbol(char symbol1, char symbol2, int i)
+{
+    if ((i + 1) % 2 == 1)
+        return symbol1;
+    else
+        return symbol2;
 }
 
 void drawLine(int freeSpace, int length, char symbol)
 {
     for (int i = 0; i < freeSpace; i++)
-    {
         putchar(' ');
-    }
+
     for (int i = 0; i < length; i++)
-    {
         putchar(symbol);
-    }
+
     putchar('\n');
 }
 
 triangle getTriangleOptions(triangle tr)
 {
+    // Type
+    printf("Select what mode do you want to work with: ");
+    fgets(tr.type, 3, stdin);
+    printf("%s. Great choise!\n", (strcomp(tr.type, "so") ? "Solid" : "Stripped"));
+
     // Height
     printf("Height of triangle: ");
     scanf("%d", &tr.height);
