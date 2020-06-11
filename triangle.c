@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 void clrscr();
 bool strcomp(char *a, char *b);
@@ -10,6 +11,9 @@ void getTriangleOptions(char *type);
 
 int main()
 {
+    /*
+        Header
+    */
     clrscr();
     printf("\n\n");
     printf("  *   Welcom to The Triangle programm.\n");
@@ -21,29 +25,39 @@ int main()
 
     clrscr();
 
+    /*
+        Preview
+    */
     drawTriangle("so", 5, '*', '\0');
     printf("(so)lid\n");
 
     drawTriangle("st", 5, '*', '+');
     printf("(st)ripped\n");
 
+    /*
+        Configuration
+    */
     printf("Select what mode do you want to work with: ");
 
+    // Type
     char type[3];
     fgets(type, 3, stdin);
 
-    printf("%s. Great choise!\n", ((type == "so") ? "Solid" : "Stripped"));
+    printf("%s. Great choise!\n", (strcomp(type, "so") ? "Solid" : "Stripped"));
 
+    // Height
     int height;
     printf("Height of triangle: ");
     scanf("%d", &height);
     getchar();
 
+    // Primary symbol
     char symbol1;
     printf("Primary symbol: ");
     symbol1 = getchar();
     getchar();
 
+    // Secondary symbol
     char symbol2;
     if (strcomp(type, "st"))
     {
@@ -51,6 +65,9 @@ int main()
         symbol2 = getchar();
     }
 
+    /*
+        Drawing
+    */
     drawTriangle(type, height, symbol1, symbol2);
 
     return 0;
