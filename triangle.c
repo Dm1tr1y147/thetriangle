@@ -5,7 +5,9 @@
 
 void clrscr();
 bool strcomp(char *a, char *b);
+void swap(char *a, char *b);
 void drawTriangle(char type[3], int height, char symbol1, char symbol2);
+void drawRomb(char type[3], int height, char symbol1, char symbol2);
 void drawLine(int freeSpace, int length, char symbol);
 void getTriangleOptions(char *type);
 
@@ -63,12 +65,25 @@ int main()
     {
         printf("Secondary symbol: ");
         symbol2 = getchar();
+        getchar();
     }
+
+    // Romb
+    bool romb;
+    printf("Make a romb? (y/n): ");
+    romb = getchar() == 'y';
 
     /*
         Drawing
     */
-    drawTriangle(type, height, symbol1, symbol2);
+    if (romb)
+    {
+        drawRomb(type, height, symbol1, symbol2);
+    }
+    else
+    {
+        drawTriangle(type, height, symbol1, symbol2);
+    }
 
     return 0;
 }
@@ -90,6 +105,13 @@ bool strcomp(char *a, char *b)
     if (a[i] != '\0' || b[i] != '\0')
         return false;
     return true;
+}
+
+void swap(char *a, char *b)
+{
+    *a = *a ^ *b;
+    *b = *b ^ *a;
+    *a = *a ^ *b;
 }
 
 void drawTriangle(char type[3], int height, char symbol1, char symbol2)
@@ -119,6 +141,53 @@ void drawTriangle(char type[3], int height, char symbol1, char symbol2)
             curSymbol = symbol2;
         }
         drawLine(height - i - 1, i * 2 + 1, curSymbol);
+    }
+}
+
+void drawRomb(char type[3], int height, char symbol1, char symbol2)
+{
+    if (strcomp(type, "so"))
+    {
+        symbol2 = symbol1;
+    }
+    else if (strcomp(type, "st"))
+    {
+    }
+    else
+    {
+        printf("Wrong input, try angain\n");
+        return;
+    }
+
+    for (int i = 0; i < height / 2; i++)
+    {
+        char curSymbol;
+        if ((i + 1) % 2 == 1)
+        {
+            curSymbol = symbol1;
+        }
+        else
+        {
+            curSymbol = symbol2;
+        }
+        drawLine(height / 2 - i, i * 2 + 1, curSymbol);
+    }
+
+    if (height % 2 == 0)
+        swap(&symbol1, &symbol2);
+
+    for (int i = height - (height / 2 + 1); i >= 0; i--)
+    {
+        char curSymbol;
+        if ((i + 1) % 2 == 1)
+        {
+            curSymbol = symbol1;
+        }
+        else
+        {
+            curSymbol = symbol2;
+        }
+        drawLine(height / 2 - i, i * 2 + 1, curSymbol);
     }
 }
 
