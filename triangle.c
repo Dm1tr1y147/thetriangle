@@ -27,7 +27,7 @@ int main()
     */
     clrscr();
     printf("\n\n");
-    printf("  *   Welcom to The Triangle programm.\n");
+    printf("  *   Welcome to The Triangle programm.\n");
     printf(" ***  It would help you to draw some simple, but beautiful triangles.\n");
     printf("***** Hope you'll enjoy using it!\n");
     printf("\n\n");
